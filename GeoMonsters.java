@@ -77,10 +77,12 @@ public class GeoMonsters extends JFrame
     public JButton createHomeButton()
     {
         // Create the home button
+        Color red = new Color(255, 102, 102);
+
         JButton button = new JButton("Home");
         button.setFont(new Font("SansSerif", Font.BOLD, 18));
-        button.setBackground(Color.RED);
-        button.setForeground(Color.WHITE);
+        button.setBackground(red);
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(120, 40));
 
@@ -103,6 +105,8 @@ class HomePanel extends JPanel implements ActionListener
     {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
+
+        Color red = new Color(255, 102, 102);
 		
 		cards = cardLayout;
 		geoFrame = frame;
@@ -145,7 +149,7 @@ class HomePanel extends JPanel implements ActionListener
         myTeamButton.setFocusPainted(false);
         myTeamButton.setFont(new Font("SansSerif", Font.BOLD, 15));
         myTeamButton.addActionListener(this);
-        //myTeamButton.setBackground(Color.RED);
+        myTeamButton.setBackground(red);
         //myTeamButton.setForeground(Color.BLACK);
         //topLeftPanel.add(myTeamButton);
         northPanel.add(myTeamButton, BorderLayout.EAST);
@@ -175,7 +179,7 @@ class HomePanel extends JPanel implements ActionListener
 		//play button
 		JButton playButton = new JButton("PLAY");
 		playButton.setFont(new Font("SansSerif", Font.BOLD, 28));
-		//playButton.setBackground(Color.RED);
+		playButton.setBackground(red);
 		playButton.setForeground(Color.BLACK);
 		playButton.setFocusPainted(false);
 		playButton.setPreferredSize(new Dimension(200, 60));
@@ -193,8 +197,8 @@ class HomePanel extends JPanel implements ActionListener
 		instructionsButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		creditsButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
-		instructionsButton.setBackground(Color.RED);
-		creditsButton.setBackground(Color.RED);
+		instructionsButton.setBackground(red);
+		creditsButton.setBackground(red);
 		instructionsButton.setForeground(Color.BLACK);
 		creditsButton.setForeground(Color.BLACK);
 
@@ -345,11 +349,11 @@ class InstructionsPanel extends JPanel implements ActionListener
 class CreditsPanel extends JPanel implements ActionListener
 {
     private CardLayout cards;
-    private GeoMonsters geoFrame;
+    private GeoMonsters geoFrame;G
    
     public CreditsPanel(GeoMonsters frame, CardLayout cardLayout)
     {
-        setLayout(null);
+        setLayout(new BorderLayout());
 		
 		
 		cards = cardLayout;
