@@ -44,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 
+
 public class GeoMonsters extends JFrame
 //holds the cards
 {
@@ -54,34 +55,35 @@ public class GeoMonsters extends JFrame
         super("GeoMonsters");  //made this thing it's own frame
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocation(500,500);
+        setLocation(100,100);
 
         cards = new CardLayout();
         setLayout(cards);
         
+        IntroPanel introPanel = new IntroPanel (this, cards);
         HomePanel homePanel = new HomePanel(this, cards);
         GamePanel gamePanel = new GamePanel(this, cards);
         InstructionsPanel instructionsPanel = new InstructionsPanel(this, cards);
         CreditsPanel creditsPanel = new CreditsPanel(this, cards);
         TeamPanel teamPanel = new TeamPanel(this,cards);
 
+        add(introPanel, "Intro");
         add(homePanel, "Home");
         add(gamePanel, "Game");
         add(instructionsPanel, "Instructions");
         add(creditsPanel, "Credits");
         add(teamPanel, "Team");
+		
 
         setVisible(true);
     }
     
     public JButton createHomeButton()
     {
-        // Create the home button
-        Color red = new Color(255, 102, 102);
-
+        // Create the button
         JButton button = new JButton("Home");
         button.setFont(new Font("SansSerif", Font.BOLD, 18));
-        button.setBackground(red);
+        button.setBackground(new Color(255,102,102));
         button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(120, 40));
@@ -93,7 +95,96 @@ public class GeoMonsters extends JFrame
     {
         new GeoMonsters();
     }
+    
+    
 }
+
+class IntroPanel extends JPanel implements ActionListener
+{
+    private CardLayout cards;
+    private GeoMonsters geoFrame;
+
+    private JCheckBox agreeCheckBox;
+    private JButton proceedButton;
+
+    public IntroPanel(GeoMonsters frame, CardLayout cardLayout)
+    {
+        setLayout(null);
+        cards = cardLayout;
+        geoFrame = frame;
+
+        JTextArea introTextArea = new JTextArea();
+        
+        String rules = new String(
+			"Rules:\n\n" +
+			"1. This game is designed for Windows 10/11 systems. Any other OS won't be optimized.\n\n" +
+			"2. Cheating or using Google to answer is strictly prohibited and will not help you prepare for the iGeo.\n\n" +
+			"3. Do not mess with the code of the game/delete any files or you may risk ruining your gaming experience.\n\n" +
+			"4. All user progress is saved locally. Uninstalling will erase your data.\n\n" +
+			"5. Respect other users and refrain from offensive behavior.\n\n" +
+			"6. By playing, you agree to our privacy policy and data handling practices.\n\n" +
+			"7. Developers are not responsible for any damages caused by this game.\n\n" +
+			"8. This game falls under Fair Use, and we will not be happy if Nintendo copyrights us.\n");
+        
+        introTextArea.setText("Welcome to GeoMonsters!\n" +
+				"This game was created by Ritik Shenoy and Anish Khinvasara\n\n" +
+				"Please read everything before continuing:\n\n" +
+                "In this game, you'll explore the world map, answer regional geography questions, " +
+                "and collect different creatures along the way.\n\n" +
+                "This educational game is meant to help prepare you for the International Geography Olympiad.\n\n" + rules);
+                
+
+
+
+        introTextArea.setEditable(false);
+        introTextArea.setLineWrap(true);
+        introTextArea.setWrapStyleWord(true);
+        introTextArea.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+        
+
+        JScrollPane scrollPane = new JScrollPane(introTextArea);
+        scrollPane.setBounds(150, 40, 500, 390);
+        add(scrollPane);
+
+        agreeCheckBox = new JCheckBox("I agree and wish to continue");
+        agreeCheckBox.setFont(new Font("Sans Serif", Font.PLAIN, 16));
+        agreeCheckBox.setBounds(175, 450, 450, 30);
+        agreeCheckBox.addActionListener(this);
+        add(agreeCheckBox);
+
+        proceedButton = new JButton("Proceed");
+        proceedButton.setBounds(325, 515, 120, 40);
+        proceedButton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        proceedButton.setBackground(new Color(255,102,102));
+        proceedButton.setForeground(Color.BLACK);
+        proceedButton.setFocusPainted(false);
+        proceedButton.setPreferredSize(new Dimension(120, 40));
+
+        
+        proceedButton.setVisible(false);
+        proceedButton.addActionListener(this);
+        add(proceedButton);
+    }
+
+
+
+    public void actionPerformed(ActionEvent e)
+    {
+        
+        if(agreeCheckBox.isSelected())
+        {
+			proceedButton.setVisible(true);
+		}
+		else
+			proceedButton.setVisible(false);
+        
+        if (e.getSource() == proceedButton)
+        {
+            cards.show(geoFrame.getContentPane(), "Home");
+        }
+    }
+}
+
 
 class HomePanel extends JPanel implements ActionListener
 {
@@ -105,8 +196,6 @@ class HomePanel extends JPanel implements ActionListener
     {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
-
-        Color red = new Color(255, 102, 102);
 		
 		cards = cardLayout;
 		geoFrame = frame;
@@ -115,13 +204,19 @@ class HomePanel extends JPanel implements ActionListener
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new BorderLayout());
         northPanel.setBackground(Color.WHITE);
+
+        JPanel filler = new JPanel();
+        filler.setPreferredSize(new Dimension(75, 75));
+        filler.setBackground(Color.WHITE);
+
+        northPanel.add(filler, BorderLayout.WEST);
         
 
         JLabel titleLabel = new JLabel("GeoMonsters", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Dialog", Font.BOLD, 48)); //serif lowkey looking a bit weird we can change this
         titleLabel.setForeground(Color.BLACK);
         northPanel.add(titleLabel, BorderLayout.CENTER);
-		
+        
         //JPanel topLeftPanel = new JPanel();
         //topLeftPanel.setOpaque(false); 
         //topLeftPanel.setLayout(new GridLayout(5, 1));
@@ -149,7 +244,7 @@ class HomePanel extends JPanel implements ActionListener
         myTeamButton.setFocusPainted(false);
         myTeamButton.setFont(new Font("SansSerif", Font.BOLD, 15));
         myTeamButton.addActionListener(this);
-        myTeamButton.setBackground(red);
+        myTeamButton.setBackground(new Color(255,102,102));
         //myTeamButton.setForeground(Color.BLACK);
         //topLeftPanel.add(myTeamButton);
         northPanel.add(myTeamButton, BorderLayout.EAST);
@@ -158,17 +253,38 @@ class HomePanel extends JPanel implements ActionListener
         add(northPanel, BorderLayout.NORTH);
        
         
-        //load the image for the center background
-        String globeName = "Globe.jpg";
-		try
+        try
         {
-			//load image
-            globeImage = ImageIO.read(new File(globeName));  
+            Image img = ImageIO.read(new File("ButtonBackground.jpg"));
+            Image scaledImg = img.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+            myTeamButton.setIcon(new ImageIcon(scaledImg));  // Set the image as the button icon
         }
         catch (IOException e)
         {
-            e.printStackTrace();  
-            System.err.println("Error opening file: " + globeName);
+            e.printStackTrace();  // Handle exception if image loading fails
+        }
+        
+        
+        //make it less ugly
+        myTeamButton.setFocusPainted(false);
+        //myTeamButton.setFont(new Font("SansSerif", Font.BOLD, 15));
+        myTeamButton.addActionListener(this);
+        myTeamButton.setBackground(new Color(255,102,102));
+        //myTeamButton.setForeground(Color.WHITE);
+        //topLeftPanel.add(myTeamButton);
+        
+        
+        //add(topLeftPanel, BorderLayout.EAST);
+        
+        //load the image for the center background
+		try
+        {
+			//load image
+            globeImage = ImageIO.read(new File("Globe.jpg"));  
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();  // Handle any errors loading the image
         }
 
         //SOUTH: Buttons Panel
@@ -177,9 +293,9 @@ class HomePanel extends JPanel implements ActionListener
         bottomPanel.setOpaque(false);
 
 		//play button
-		JButton playButton = new JButton("PLAY");
+		JButton playButton = new JButton("PLAY"); 
 		playButton.setFont(new Font("SansSerif", Font.BOLD, 28));
-		playButton.setBackground(red);
+		playButton.setBackground(new Color(255,102,102));
 		playButton.setForeground(Color.BLACK);
 		playButton.setFocusPainted(false);
 		playButton.setPreferredSize(new Dimension(200, 60));
@@ -194,11 +310,11 @@ class HomePanel extends JPanel implements ActionListener
 		JButton instructionsButton = new JButton("Instructions");
 		JButton creditsButton = new JButton("Credits");
 
-		instructionsButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-		creditsButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		instructionsButton.setFont(new Font("SansSerif", Font.BOLD, 15));
+		creditsButton.setFont(new Font("SansSerif", Font.BOLD, 15));
 
-		instructionsButton.setBackground(red);
-		creditsButton.setBackground(red);
+		instructionsButton.setBackground(new Color(255,102,102));
+		creditsButton.setBackground(new Color(255,102,102));
 		instructionsButton.setForeground(Color.BLACK);
 		creditsButton.setForeground(Color.BLACK);
 
@@ -255,8 +371,9 @@ class HomePanel extends JPanel implements ActionListener
 
         if (globeImage != null)
         {
-			int newWidth = (int)(globeImage.getWidth(this)*0.64);
-			int newHeight = (int)(globeImage.getHeight(this)*0.64);
+			
+			int newWidth = globeImage.getWidth(this) -150;
+			int newHeight = globeImage.getHeight(this) -150;
             //image was too big
            
 			//center image
@@ -318,7 +435,16 @@ class InstructionsPanel extends JPanel implements ActionListener
 		
 		//JTextArea for the instructions
 		JTextArea instructionsTextArea = new JTextArea();
-		instructionsTextArea.setText("Instructions\n---we can write here ---\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+		
+		String instructions = new String(
+			"Instructions:\n\n" +
+			"1. Please run this program on Windows 10/11 for the best experience.\n\n" +
+			"2. "); //lets put the instructions here
+		
+		instructionsTextArea.setText("Welcome to GeoMonsters!\n\n" +
+                "In this game, you'll explore the world map, answer regional geography questions, " +
+                "and collect different creatures along the way.\n\n" +
+                "This educational game is meant to help prepare you for the International Geography Olympiad.\n\n" + instructions);
 		instructionsTextArea.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		instructionsTextArea.setEditable(false);
 		instructionsTextArea.setLineWrap(true);
@@ -349,7 +475,7 @@ class InstructionsPanel extends JPanel implements ActionListener
 class CreditsPanel extends JPanel implements ActionListener
 {
     private CardLayout cards;
-    private GeoMonsters geoFrame;G
+    private GeoMonsters geoFrame;
    
     public CreditsPanel(GeoMonsters frame, CardLayout cardLayout)
     {
@@ -361,7 +487,7 @@ class CreditsPanel extends JPanel implements ActionListener
 		
 		//JTextArea for the credits
 		JTextArea creditsTextArea = new JTextArea();
-		creditsTextArea.setText("Credits\n\nStackOverflow - adding ImageIcon to JButton, setOpaque\nOracle - SwingConstants\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+		creditsTextArea.setText("Credits:\n\nStackOverflow - adding ImageIcon to JButton, setOpaque\nOracle - SwingConstants\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		creditsTextArea.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		creditsTextArea.setEditable(false);
 		creditsTextArea.setLineWrap(true);
@@ -423,3 +549,4 @@ class TeamPanel extends JPanel implements ActionListener
 		cards.show(geoFrame.getContentPane(), "Home");
 	}
 }
+
