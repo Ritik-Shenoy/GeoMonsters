@@ -149,6 +149,7 @@ class IntroPanel extends JPanel implements ActionListener
         agreeCheckBox.setFont(new Font("Sans Serif", Font.PLAIN, 16));
         agreeCheckBox.setBounds(175, 450, 450, 30);
         agreeCheckBox.addActionListener(this);
+        agreeCheckBox.setFocusPainted(false);
         add(agreeCheckBox);
 
         proceedButton = new JButton("Proceed");
