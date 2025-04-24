@@ -121,10 +121,9 @@ class IntroPanel extends JPanel implements ActionListener
 			"2. Cheating or using Google to answer is strictly prohibited and will not help you prepare for the iGeo.\n\n" +
 			"3. Do not mess with the code of the game/delete any files or you may risk ruining your gaming experience.\n\n" +
 			"4. All user progress is saved locally. Uninstalling will erase your data.\n\n" +
-			"5. Respect other users and refrain from offensive behavior.\n\n" +
-			"6. By playing, you agree to our privacy policy and data handling practices.\n\n" +
-			"7. Developers are not responsible for any damages caused by this game.\n\n" +
-			"8. This game falls under Fair Use, and we will not be happy if Nintendo copyrights us.\n");
+			"5. By playing, you agree to our privacy policy and data handling practices.\n\n" +
+			"6. Developers are not responsible for any damages caused by this game.\n\n" +
+			"7. This game falls under Fair Use, and we will not be happy if Nintendo copyrights us.\n");
         
         introTextArea.setText("Welcome to GeoMonsters!\n" +
 				"This game was created by Ritik Shenoy and Anish Khinvasara\n\n" +
@@ -549,4 +548,3 @@ class TeamPanel extends JPanel implements ActionListener
 		cards.show(geoFrame.getContentPane(), "Home");
 	}
 }
-
