@@ -639,7 +639,8 @@ class QuestionPanel extends JPanel implements ActionListener
     private JButton answerButton4;
     private Timer countdownTimer;
     private int timeRemaining = 15;
-    private ImageIcon clockImage;
+    private ImageIcon clockImage;	
+    private JButton backButton;
    
     public QuestionPanel(GeoMonsters frame, CardLayout cardLayout)
     {
@@ -689,7 +690,7 @@ class QuestionPanel extends JPanel implements ActionListener
             System.out.println("Error loading clock image: " + e.getMessage());
         }
         
-        timerLabel = new JLabel(String.valueOf(timeRemaining));
+        timerLabel = new JLabel("" + timeRemaining); //int to string
         timerLabel.setFont(new Font("Arial", Font.BOLD, 30));
         timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         timerLabel.setForeground(Color.RED);
@@ -782,12 +783,13 @@ class QuestionPanel extends JPanel implements ActionListener
         answerButton4.addActionListener(this); // Answer button action
         add(answerButton4);
 
-        JButton homeButton = geoFrame.createHomeButton();
-        homeButton.setText("BACK"); // back to map
-        homeButton.setBounds(325, 520, 120, 40);
-        homeButton.setFont(new Font("SansSerif", Font.BOLD, 18));
-        add(homeButton);
-        homeButton.addActionListener(this);
+        backButton = geoFrame.createHomeButton();
+        backButton.setActionCommand("BACK");
+        backButton.setText("BACK"); // back to map
+        backButton.setBounds(325, 520, 120, 40);
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        add(backButton);
+        backButton.addActionListener(this);
     }
     
     public void setVisible(boolean visible)
@@ -836,14 +838,14 @@ class QuestionPanel extends JPanel implements ActionListener
         stopTimer();
         //when you click any button you will leave the Panel so we stop timer
         
-        if (e.getSource() == "BACK")
+        if (e.getSource() == backButton)
 		{
 		
 			cards.show(geoFrame.getContentPane(), "Game");
 		}
         else
 			cards.show(geoFrame.getContentPane(), "Answer");
-    }
+		}
 }
 
 
