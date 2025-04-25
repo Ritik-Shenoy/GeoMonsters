@@ -718,6 +718,7 @@ class QuestionPanel extends JPanel implements ActionListener
                 if (timeRemaining <= 0)
                 {
                     countdownTimer.stop();
+					cards.show(geoFrame.getContentPane(), "Answer");
                 }
                 repaint();
             }
