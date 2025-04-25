@@ -42,6 +42,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.Timer;
 
 
 
@@ -66,13 +70,18 @@ public class GeoMonsters extends JFrame
         InstructionsPanel instructionsPanel = new InstructionsPanel(this, cards);
         CreditsPanel creditsPanel = new CreditsPanel(this, cards);
         TeamPanel teamPanel = new TeamPanel(this,cards);
+        QuestionPanel questionPanel = new QuestionPanel(this,cards);
+		AnswerPanel answerPanel = new AnswerPanel(this,cards);
 
+		
         add(introPanel, "Intro");
         add(homePanel, "Home");
         add(gamePanel, "Game");
         add(instructionsPanel, "Instructions");
         add(creditsPanel, "Credits");
         add(teamPanel, "Team");
+        add(questionPanel, "Question");
+        add(answerPanel, "Answer");
 		
 
         setVisible(true);
@@ -384,40 +393,106 @@ class HomePanel extends JPanel implements ActionListener
     }
 }
 
-class GamePanel extends JPanel implements ActionListener
+class GamePanel extends JPanel implements ActionListener, MouseListener
 {
     private CardLayout cards;
     private GeoMonsters geoFrame;
-   
+    private Image mapImage;
+
     public GamePanel(GeoMonsters frame, CardLayout cardLayout)
     {
-        setLayout(new BorderLayout());
-		
-		
-		cards = cardLayout;
-		geoFrame = frame;
-		
-        //Placeholder for right now
-        JLabel label = new JLabel("This is the Game Panel", SwingConstants.CENTER);
-        label.setFont(new Font("SansSerif", Font.BOLD, 24));
-        add(label, BorderLayout.CENTER);
+        setLayout(new BorderLayout());  // Use BorderLayout to organize the components
 
-        //home button
+        cards = cardLayout;
+        geoFrame = frame;
+		
+		addMouseListener(this);
+		requestFocusInWindow();
+		
+        // Load the world map image
+        try
+        {
+            mapImage = ImageIO.read(new File("world_map.jpg")); // Replace with your map image
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace(); // Handle image loading error
+            System.err.println("Error opening map image file.");
+        }
+
+        // Create a JPanel at the top with a JLabel for instructions
+        JPanel topPanel = new JPanel();
+        JLabel instructionsLabel = new JLabel("Click anywhere on the map!");
+        instructionsLabel.setFont(new Font("SansSerif", Font.BOLD, 25));
+        topPanel.add(instructionsLabel);
+        topPanel.setOpaque(false);  // Make the top panel transparent
+        add(topPanel, BorderLayout.NORTH);  // Add the top panel at the top
+
+        // Home button at the bottom
         JButton homeButton = geoFrame.createHomeButton();
-        
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-        bottomPanel.setOpaque(false);
+        bottomPanel.setOpaque(false); // Make the bottom panel transparent
         bottomPanel.add(homeButton);
         add(bottomPanel, BorderLayout.SOUTH);
 
         homeButton.addActionListener(this);
-        
     }
+
+    // Paint the map image on the panel
     
-    public void actionPerformed(ActionEvent e)
-    {
-		cards.show(geoFrame.getContentPane(), "Home");
+	protected void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+
+		if (mapImage != null)
+		{
+			// Get the panel dimensions
+			int panelWidth = getWidth();
+			int panelHeight = getHeight();
+
+			// Define the height reserved for the JLabel at the top of the screen
+			int labelHeight = 50;  // You can change this based on the actual height of the JLabel
+
+			// Height available for the map (panel height minus the space for the JLabel)
+			int availableHeight = panelHeight - labelHeight;
+
+			// Scale the map image to take up the entire available height while maintaining aspect ratio
+			int newWidth = panelWidth;
+			int newHeight = (mapImage.getHeight(null) * panelWidth) / mapImage.getWidth(null);
+
+			// If the scaled height is smaller than the available height, adjust the width to fit
+			if (newHeight < availableHeight) 
+			{
+				newHeight = availableHeight; // Make the image fit the available height
+				newWidth = (mapImage.getWidth(null) * availableHeight) / mapImage.getHeight(null);
+			}
+
+			// Position the image to start drawing from below the JLabel
+			int x = (panelWidth - newWidth) / 2;  // Center horizontally
+			int y = labelHeight;  // Start drawing just below the label
+
+			g.drawImage(mapImage, x, y, newWidth, newHeight, this);
+		}
 	}
+
+	public void mouseClicked(MouseEvent e) 
+	{
+		cards.show(geoFrame.getContentPane(), "Question");
+		
+    }
+
+   
+    public void mouseReleased(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {}
+
+
+    public void actionPerformed(ActionEvent e)
+    
+    {
+        cards.show(geoFrame.getContentPane(), "Home");
+    }
 }
 
 class InstructionsPanel extends JPanel implements ActionListener
@@ -532,7 +607,7 @@ class TeamPanel extends JPanel implements ActionListener
         label.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(label, BorderLayout.CENTER);
 
-        // Home button
+        //home button
         JButton homeButton = geoFrame.createHomeButton();
         
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
@@ -547,5 +622,263 @@ class TeamPanel extends JPanel implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
 		cards.show(geoFrame.getContentPane(), "Home");
+	}
+}
+
+
+class QuestionPanel extends JPanel implements ActionListener
+{
+    private CardLayout cards;
+    private GeoMonsters geoFrame;
+    private JLabel timerLabel;
+    private JPanel imagePanel;
+    private JButton skipButton;
+    private JButton answerButton1;
+    private JButton answerButton2;
+    private JButton answerButton3;
+    private JButton answerButton4;
+    private Timer countdownTimer;
+    private int timeRemaining = 15;
+    private ImageIcon clockImage;
+   
+    public QuestionPanel(GeoMonsters frame, CardLayout cardLayout)
+    {
+        setLayout(null);
+        
+        cards = cardLayout;
+        geoFrame = frame;
+
+        // top question bar
+        JLabel questionLabel = new JLabel("Question: ", SwingConstants.CENTER);
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        questionLabel.setBounds(10, 10, 780, 30);
+        questionLabel.setOpaque(true);
+        questionLabel.setBackground(new Color(230, 230, 230)); //gray
+        add(questionLabel);
+        
+        JPanel contentPanel = new JPanel(null);
+        contentPanel.setBounds(10, 50, 780, 350);
+        contentPanel.setBackground(new Color(240, 240, 240));
+        contentPanel.setOpaque(true);
+        add(contentPanel);
+        
+        //anonymous inner class (credits to StackOverflow)
+        JPanel timerPanel = new JPanel(null)
+        {
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                if (clockImage != null)
+                {
+                    g.drawImage(clockImage.getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
+                    //clockImage is an ImageIcon
+                }
+            }
+        };
+        timerPanel.setBounds(20, 120, 80, 80);
+        timerPanel.setOpaque(false);
+        contentPanel.add(timerPanel);
+        
+        try
+        {
+            clockImage = new ImageIcon("clock.jpg");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Error loading clock image: " + e.getMessage());
+        }
+        
+        timerLabel = new JLabel(String.valueOf(timeRemaining));
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        timerLabel.setForeground(Color.RED);
+        timerLabel.setBounds(0, 0, 80, 80);
+        
+		//timer label is transparent allowing the image behind to work
+        timerLabel.setOpaque(false);
+        timerPanel.add(timerLabel);
+        
+        // Create countdown timer (1 second intervals)
+        countdownTimer = new Timer(1000, new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                timeRemaining--;
+                timerLabel.setText("" + timeRemaining);
+                
+                if (timeRemaining <= 5)
+                //timer turns red when timer is low
+                {
+                    timerLabel.setForeground(Color.RED);
+                }
+                
+                //stop when it ends
+                if (timeRemaining <= 0)
+                {
+                    countdownTimer.stop();
+                }
+                repaint();
+            }
+        });
+        
+        //center image
+        imagePanel = new JPanel()
+        {
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                g.setColor(Color.BLACK);
+                g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+            }
+        };
+        
+        imagePanel.setBounds(120, 20, 560, 310);
+        contentPanel.add(imagePanel);
+        
+        skipButton = new JButton("SKIP");
+        skipButton.setBounds(690, 20, 80, 35);
+        skipButton.setBackground(new Color(255,102,102));
+        skipButton.setForeground(Color.BLACK);
+        skipButton.setOpaque(true);
+        skipButton.setFocusPainted(false);
+        skipButton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        skipButton.addActionListener(this); // Skip button action
+        contentPanel.add(skipButton);
+
+        answerButton1 = new JButton("Red");
+        answerButton1.setBounds(10, 410, 380, 50);
+        answerButton1.setBackground(new Color(255,102,102));
+        answerButton1.setForeground(Color.BLACK);
+        answerButton1.setFocusPainted(false);
+        answerButton1.setFont(new Font("SansSerif", Font.BOLD, 14));
+        answerButton1.addActionListener(this); // Answer button action
+        add(answerButton1);
+
+        answerButton2 = new JButton("Blue");
+        answerButton2.setBounds(400, 410, 380, 50);
+        answerButton2.setBackground(Color.BLUE);
+        answerButton2.setForeground(Color.BLACK);
+        answerButton2.setFocusPainted(false);
+        answerButton2.setFont(new Font("SansSerif", Font.BOLD, 14));
+        answerButton2.addActionListener(this); // Answer button action
+        add(answerButton2);
+
+        answerButton3 = new JButton("Yellow");
+        answerButton3.setBounds(10, 465, 380, 50);
+        answerButton3.setBackground(Color.YELLOW);
+        answerButton3.setForeground(Color.BLACK);
+        answerButton3.setFocusPainted(false);
+        answerButton3.setFont(new Font("SansSerif", Font.BOLD, 14));
+        answerButton3.addActionListener(this); // Answer button action
+        add(answerButton3);
+
+        answerButton4 = new JButton("Green");
+        answerButton4.setBounds(400, 465, 380, 50);
+        answerButton4.setBackground(Color.GREEN);
+        answerButton4.setForeground(Color.BLACK);
+        answerButton4.setFocusPainted(false);
+        answerButton4.setFont(new Font("SansSerif", Font.BOLD, 14));
+        answerButton4.addActionListener(this); // Answer button action
+        add(answerButton4);
+
+        JButton homeButton = geoFrame.createHomeButton();
+        homeButton.setText("BACK"); // back to map
+        homeButton.setBounds(325, 520, 120, 40);
+        homeButton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        add(homeButton);
+        homeButton.addActionListener(this);
+    }
+    
+    public void setVisible(boolean visible)
+    {
+		//method only starts the timer when the panel is shown
+        super.setVisible(visible);
+        if (visible)
+        {
+            startTimer(); 
+        }
+        else
+        {
+            stopTimer();
+        }
+    }
+    
+    public void startTimer()
+    {
+        timeRemaining = 15;
+        timerLabel.setText("" + timeRemaining); //string to work
+        timerLabel.setForeground(Color.BLACK);
+        countdownTimer.start();
+    }
+    
+	//when panel isnt visible this runs
+	public void stopTimer()
+    {
+        if (countdownTimer.isRunning())
+        {
+            countdownTimer.stop();
+            timeRemaining = 15; //reset
+        }
+    }
+    
+    protected void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        g.setColor(Color.GRAY);
+        g.drawRect(10, 50, 780, 350);
+        g.drawRect(9, 49, 782, 352);
+        //double line border
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        stopTimer();
+        //when you click any button you will leave the Panel so we stop timer
+        
+        if (e.getSource() == "BACK")
+		{
+		
+			cards.show(geoFrame.getContentPane(), "Game");
+		}
+        else
+			cards.show(geoFrame.getContentPane(), "Answer");
+    }
+}
+
+
+class AnswerPanel extends JPanel implements ActionListener
+{
+    private CardLayout cards;
+    private GeoMonsters geoFrame;
+   
+    public AnswerPanel(GeoMonsters frame, CardLayout cardLayout)
+    {
+        setLayout(new BorderLayout());
+		
+		
+		cards = cardLayout;
+		geoFrame = frame;
+		
+        //Placeholder for right now
+        JLabel label = new JLabel("This is the Answer Panel", SwingConstants.CENTER);
+        label.setFont(new Font("SansSerif", Font.BOLD, 24));
+        add(label, BorderLayout.CENTER);
+
+        // Home button
+        JButton homeButton = geoFrame.createHomeButton();
+        homeButton.setText("MAP");
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+        bottomPanel.setOpaque(false);
+        bottomPanel.add(homeButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        homeButton.addActionListener(this);
+        
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+		cards.show(geoFrame.getContentPane(), "Game");
 	}
 }
